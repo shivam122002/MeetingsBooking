@@ -462,3 +462,191 @@ body {
     font-size: 13px;
     margin: 0;
 }
+.meeting-details-container {
+    max-width: 950px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(280px, 0.8fr);
+    gap: 24px;
+    align-items: start;
+}
+
+.meeting-form-card,
+.selected-booking-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(17, 24, 39, 0.06);
+}
+
+.meeting-form-card {
+    padding: 34px;
+}
+
+.selected-booking-card {
+    padding: 28px;
+    position: sticky;
+    top: 30px;
+}
+
+.form-heading {
+    margin-bottom: 30px;
+}
+
+.form-heading h2 {
+    margin: 0;
+    color: #111827;
+    font-size: 24px;
+}
+
+.form-heading p {
+    margin: 8px 0 0;
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 24px;
+}
+
+.form-group label {
+    margin-bottom: 9px;
+    color: #374151;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    border: 1px solid #d1d5db;
+    border-radius: 9px;
+    padding: 12px 14px;
+    color: #111827;
+    background: #ffffff;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    resize: vertical;
+    transition: border-color 0.2s,
+                box-shadow 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.field-help {
+    margin-top: 7px;
+    color: #9ca3af;
+    font-size: 11px;
+}
+
+.optional-text {
+    margin-left: 5px;
+    color: #9ca3af;
+    font-size: 11px;
+    font-weight: 400;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding-top: 8px;
+}
+
+.secondary-button,
+.confirm-booking-button {
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.secondary-button {
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    color: #374151;
+}
+
+.secondary-button:hover {
+    background: #f9fafb;
+}
+
+.confirm-booking-button {
+    border: none;
+    background: #2563eb;
+    color: #ffffff;
+}
+
+.confirm-booking-button:hover {
+    background: #1d4ed8;
+}
+
+.confirm-booking-button:disabled {
+    background: #cbd5e1;
+    cursor: not-allowed;
+}
+
+.selected-booking-card h3 {
+    margin: 0 0 24px;
+    color: #111827;
+    font-size: 18px;
+}
+
+.selected-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 16px 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.selected-detail span {
+    color: #6b7280;
+    font-size: 12px;
+}
+
+.selected-detail strong {
+    color: #111827;
+    font-size: 14px;
+}
+
+@media (max-width: 850px) {
+    .meeting-details-container {
+        grid-template-columns: 1fr;
+    }
+
+    .selected-booking-card {
+        position: static;
+    }
+}
+.confirm-booking-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    min-width: 155px;
+}
+
+.inline-loader {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.45);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: booking-spin 0.7s linear infinite;
+}
+
+@keyframes booking-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
