@@ -1,0 +1,317 @@
+@page "/meeting-booking"
+@inject NavigationManager Navigation
+
+<PageTitle>Book Your Meeting</PageTitle>
+
+<div class="booking-page">
+
+    <div class="booking-page-header">
+
+        <button class="back-button"
+                @onclick="GoBack">
+            ←
+        </button>
+
+        <h1>Book Your Meeting</h1>
+
+        <div class="header-placeholder"></div>
+
+    </div>
+
+    <div class="booking-container">
+
+        <div class="booking-selection">
+
+            <section class="booking-section">
+
+                <span class="section-label">
+                    SELECT DATE
+                </span>
+
+                <div class="calendar-header">
+
+                    <button @onclick="PreviousMonth"
+                            disabled="@IsCurrentMonth">
+                        ‹
+                    </button>
+
+                    <h3>
+                        @CurrentMonth.ToString("MMMM yyyy")
+                    </h3>
+
+                    <button @onclick="NextMonth">
+                        ›
+                    </button>
+
+                </div>
+
+                <div class="calendar-week">
+
+                    <span>Sun</span>
+                    <span>Mon</span>
+                    <span>Tue</span>
+                    <span>Wed</span>
+                    <span>Thu</span>
+                    <span>Fri</span>
+                    <span>Sat</span>
+
+                </div>
+
+                <div class="calendar-grid">
+
+                    @for (var i = 0;
+                          i < StartingEmptyDays;
+                          i++)
+                    {
+                        <div class="calendar-empty"></div>
+                    }
+
+                    @foreach (var date in CalendarDates)
+                    {
+                        <button class="@GetDateClass(date)"
+                                disabled="@IsPastDate(date)"
+                                @onclick="() => SelectDate(date)">
+
+                            @date.Day
+
+                        </button>
+                    }
+
+                </div>
+
+            </section>
+
+            <section class="booking-section time-section">
+
+                <span class="section-label">
+                    AVAILABLE TIME
+                </span>
+
+                @if (SelectedDate is null)
+                {
+                    <p class="time-message">
+                        Select a date to view available time slots.
+                    </p>
+                }
+                else
+                {
+                    <div class="time-slots">
+
+                        @foreach (var time in TimeSlots)
+                        {
+                            <button class="time-slot @(SelectedTime == time ? "selected" : "")"
+                                    @onclick="() => SelectTime(time)">
+
+                                @time
+
+                            </button>
+                        }
+
+                    </div>
+                }
+
+            </section>
+
+            <div class="timezone-section">
+
+                <span class="section-label">
+                    TIME ZONE
+                </span>
+
+                <div class="timezone-value">
+                    🌐 Asia/Kolkata (GMT +5:30)
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="booking-summary">
+
+            <div class="summary-card">
+
+                <span class="section-label">
+                    YOUR BOOKING
+                </span>
+
+                <h2>Meeting Summary</h2>
+
+                <div class="summary-item">
+
+                    <span class="summary-title">
+                        Date
+                    </span>
+
+                    <strong>
+                        @(SelectedDate?.ToString(
+                            "dddd, dd MMMM yyyy")
+                          ?? "Select a date")
+                    </strong>
+
+                </div>
+
+                <div class="summary-item">
+
+                    <span class="summary-title">
+                        Time
+                    </span>
+
+                    <strong>
+                        @(SelectedTime ?? "Select a time")
+                    </strong>
+
+                </div>
+
+                <div class="summary-item">
+
+                    <span class="summary-title">
+                        Time Zone
+                    </span>
+
+                    <strong>
+                        Asia/Kolkata
+                    </strong>
+
+                </div>
+
+                <button class="book-button"
+                        disabled="@(!CanBook)">
+                    Book Meeting
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@code
+{
+    private DateTime Today = DateTime.Today;
+
+    private DateTime CurrentMonth;
+
+    private DateTime? SelectedDate;
+
+    private string? SelectedTime;
+
+    protected override void OnInitialized()
+    {
+        CurrentMonth = new DateTime(
+            Today.Year,
+            Today.Month,
+            1);
+    }
+
+    private bool IsCurrentMonth =>
+        CurrentMonth.Year == Today.Year &&
+        CurrentMonth.Month == Today.Month;
+
+    private bool CanBook =>
+        SelectedDate.HasValue &&
+        SelectedTime is not null;
+
+    private int StartingEmptyDays =>
+        (int)CurrentMonth.DayOfWeek;
+
+    private IEnumerable<DateTime> CalendarDates
+    {
+        get
+        {
+            var totalDays = DateTime.DaysInMonth(
+                CurrentMonth.Year,
+                CurrentMonth.Month);
+
+            return Enumerable
+                .Range(1, totalDays)
+                .Select(day =>
+                    new DateTime(
+                        CurrentMonth.Year,
+                        CurrentMonth.Month,
+                        day));
+        }
+    }
+
+    private readonly List<string> TimeSlots = new()
+    {
+        "09:00 AM",
+        "10:00 AM",
+        "11:00 AM",
+        "12:00 PM",
+        "02:00 PM",
+        "03:00 PM"
+    };
+
+    private bool IsPastDate(DateTime date)
+    {
+        return date.Date < Today;
+    }
+
+    private string GetDateClass(DateTime date)
+    {
+        var cssClass = "calendar-day";
+
+        if (IsPastDate(date))
+        {
+            cssClass += " past-date";
+        }
+
+        if (SelectedDate?.Date == date.Date)
+        {
+            cssClass += " selected";
+        }
+
+        if (date.Date == Today)
+        {
+            cssClass += " today";
+        }
+
+        return cssClass;
+    }
+
+    private void SelectDate(DateTime date)
+    {
+        if (IsPastDate(date))
+            return;
+
+        SelectedDate = date;
+
+        SelectedTime = null;
+    }
+
+    private void SelectTime(string time)
+    {
+        SelectedTime = time;
+    }
+
+    private void PreviousMonth()
+    {
+        if (IsCurrentMonth)
+            return;
+
+        CurrentMonth = CurrentMonth.AddMonths(-1);
+
+        ResetSelection();
+    }
+
+    private void NextMonth()
+    {
+        CurrentMonth = CurrentMonth.AddMonths(1);
+
+        ResetSelection();
+    }
+
+    private void ResetSelection()
+    {
+        SelectedDate = null;
+
+        SelectedTime = null;
+    }
+
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/");
+    }
+}
