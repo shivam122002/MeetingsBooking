@@ -1,5 +1,9 @@
 @page "/meeting-booking"
 @inject NavigationManager Navigation
+@using System.Text.Json;
+@using MeetingsBooking.Shared.Dtos;
+@using System.Text.Json
+@inject IBookMeetings BookMeetings;
 
 <PageTitle>Book Your Meeting</PageTitle>
 
@@ -8,165 +12,354 @@
     <div class="booking-page-header">
 
         <button class="back-button"
-                @onclick="GoBack">
+                @onclick="HandleBack">
             ←
         </button>
 
-        <h1>Book Your Meeting</h1>
+        <h1>
+            @(BookingStep == 1
+                ? "Book Your Meeting"
+                : "Meeting Details")
+        </h1>
 
         <div class="header-placeholder"></div>
 
     </div>
 
-    <div class="booking-container">
+    @if (BookingStep == 1)
+    {
+        <div class="booking-container">
 
-        <div class="booking-selection">
+            <div class="booking-selection">
 
-            <section class="booking-section">
+                <section class="booking-section">
 
-                <span class="section-label">
-                    SELECT DATE
-                </span>
+                    <span class="section-label">
+                        SELECT DATE
+                    </span>
 
-                <div class="calendar-header">
+                    <div class="calendar-header">
 
-                    <button @onclick="PreviousMonth"
-                            disabled="@IsCurrentMonth">
-                        ‹
-                    </button>
-
-                    <h3>
-                        @CurrentMonth.ToString("MMMM yyyy")
-                    </h3>
-
-                    <button @onclick="NextMonth">
-                        ›
-                    </button>
-
-                </div>
-
-                <div class="calendar-week">
-
-                    <span>Sun</span>
-                    <span>Mon</span>
-                    <span>Tue</span>
-                    <span>Wed</span>
-                    <span>Thu</span>
-                    <span>Fri</span>
-                    <span>Sat</span>
-
-                </div>
-
-                <div class="calendar-grid">
-
-                    @for (var i = 0;
-                          i < StartingEmptyDays;
-                          i++)
-                    {
-                        <div class="calendar-empty"></div>
-                    }
-
-                    @foreach (var date in CalendarDates)
-                    {
-                        <button class="@GetDateClass(date)"
-                                disabled="@IsPastDate(date)"
-                                @onclick="() => SelectDate(date)">
-
-                            @date.Day
-
+                        <button @onclick="PreviousMonth"
+                                disabled="@IsCurrentMonth">
+                            ‹
                         </button>
-                    }
 
-                </div>
+                        <h3>
+                            @CurrentMonth.ToString("MMMM yyyy")
+                        </h3>
 
-            </section>
+                        <button @onclick="NextMonth">
+                            ›
+                        </button>
 
-            <section class="booking-section time-section">
+                    </div>
 
-                <span class="section-label">
-                    AVAILABLE TIME
-                </span>
+                    <div class="calendar-week">
 
-                @if (SelectedDate is null)
-                {
-                    <p class="time-message">
-                        Select a date to view available time slots.
-                    </p>
-                }
-                else
-                {
-                    <div class="time-slots">
+                        <span>Sun</span>
+                        <span>Mon</span>
+                        <span>Tue</span>
+                        <span>Wed</span>
+                        <span>Thu</span>
+                        <span>Fri</span>
+                        <span>Sat</span>
 
-                        @foreach (var time in TimeSlots)
+                    </div>
+
+                    <div class="calendar-grid">
+
+                        @for (var i = 0;
+                              i < StartingEmptyDays;
+                              i++)
                         {
-                            <button class="time-slot @(SelectedTime == time ? "selected" : "")"
-                                    @onclick="() => SelectTime(time)">
+                            <div class="calendar-empty"></div>
+                        }
 
-                                @time
+                        @foreach (var date in CalendarDates)
+                        {
+                            <button class="@GetDateClass(date)"
+                                    disabled="@IsPastDate(date)"
+                                    @onclick="() => SelectDate(date)">
+
+                                @date.Day
 
                             </button>
                         }
 
                     </div>
-                }
 
-            </section>
+                </section>
 
-            <div class="timezone-section">
+                <section class="booking-section time-section">
 
-                <span class="section-label">
-                    TIME ZONE
-                </span>
+                    <span class="section-label">
+                        AVAILABLE TIME
+                    </span>
 
-                <div class="timezone-value">
-                    🌐 Asia/Kolkata (GMT +5:30)
+                    @if (SelectedDate is null)
+                    {
+                        <p class="time-message">
+                            Select a date to view available time slots.
+                        </p>
+                    }
+                    else
+                    {
+                        <div class="time-slots">
+
+                            @foreach (var time in TimeSlots)
+                            {
+                                <button class="time-slot @(SelectedTime == time ? "selected" : "")"
+                                        @onclick="() => SelectTime(time)">
+
+                                    @time
+
+                                </button>
+                            }
+
+                        </div>
+                    }
+
+                </section>
+
+                <div class="timezone-section">
+
+                    <span class="section-label">
+                        TIME ZONE
+                    </span>
+
+                    <div class="timezone-value">
+                        🌐 Asia/Kolkata (GMT +5:30)
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="booking-summary">
+
+                <div class="summary-card">
+
+                    <span class="section-label">
+                        YOUR BOOKING
+                    </span>
+
+                    <h2>Meeting Summary</h2>
+
+                    <div class="summary-item">
+
+                        <span class="summary-title">
+                            Date
+                        </span>
+
+                        <strong>
+                            @(SelectedDate?.ToString(
+                                "dddd, dd MMMM yyyy")
+                              ?? "Select a date")
+                        </strong>
+
+                    </div>
+
+                    <div class="summary-item">
+
+                        <span class="summary-title">
+                            Time
+                        </span>
+
+                        <strong>
+                            @(SelectedTime ?? "Select a time")
+                        </strong>
+
+                    </div>
+
+                    <div class="summary-item">
+
+                        <span class="summary-title">
+                            Duration
+                        </span>
+
+                        <strong>
+                            @MeetingDuration Minutes
+                        </strong>
+
+                    </div>
+
+                    <div class="summary-item">
+
+                        <span class="summary-title">
+                            Time Zone
+                        </span>
+
+                        <strong>
+                            Asia/Kolkata
+                        </strong>
+
+                    </div>
+
+                    <button class="book-button"
+                            disabled="@(!CanBook)"
+                            @onclick="OpenMeetingDetails">
+
+                        Continue
+
+                    </button>
+
                 </div>
 
             </div>
 
         </div>
+    }
+    else
+    {
+        <div class="meeting-details-container">
 
-        <div class="booking-summary">
+            <div class="meeting-form-card">
 
-            <div class="summary-card">
+                <div class="form-heading">
+
+                    <span class="section-label">
+                        MEETING INFORMATION
+                    </span>
+
+                    <h2>Tell us about your meeting</h2>
+
+                    <p>
+                        Add the details that will help everyone
+                        prepare for the meeting.
+                    </p>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>
+                        Meeting Title
+                    </label>
+
+                    <input type="text"
+                           @bind="MeetingTitle"
+                           placeholder="e.g. Project Review Meeting" />
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>
+                        Reason for Meeting
+                    </label>
+
+                    <textarea @bind="MeetingReason"
+                              rows="4"
+                              placeholder="Why are you scheduling this meeting?">
+                    </textarea>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>
+                        Discussion Topics
+                    </label>
+
+                    <textarea @bind="DiscussionTopics"
+                              rows="5"
+                              placeholder="Add topics that will be discussed during the meeting">
+                    </textarea>
+
+                    <span class="field-help">
+                        You can add multiple topics on separate lines.
+                    </span>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>
+                        Additional Notes
+                        <span class="optional-text">
+                            Optional
+                        </span>
+                    </label>
+
+                    <textarea @bind="AdditionalNotes"
+                              rows="4"
+                              placeholder="Anything else attendees should know?">
+                    </textarea>
+
+                </div>
+
+                <div class="form-actions">
+
+                    <button class="secondary-button"
+                            @onclick="BackToSchedule">
+
+                        Back
+
+                    </button>
+
+                    <button class="confirm-booking-button"
+                            disabled="@(!CanConfirmBooking)"
+                            @onclick="ConfirmBooking">
+
+                        @if (IsBooking)
+                        {
+                            <span class="inline-loader"></span>
+                            <span>Booking...</span>
+                        }
+                        else
+                        {
+                            <span>Confirm Booking</span>
+                        }
+
+                    </button>
+
+                </div>
+
+            </div>
+
+            <aside class="selected-booking-card">
 
                 <span class="section-label">
-                    YOUR BOOKING
+                    BOOKING SUMMARY
                 </span>
 
-                <h2>Meeting Summary</h2>
+                <h3>Your selected schedule</h3>
 
-                <div class="summary-item">
+                <div class="selected-detail">
 
-                    <span class="summary-title">
-                        Date
-                    </span>
+                    <span>Date</span>
 
                     <strong>
-                        @(SelectedDate?.ToString(
-                            "dddd, dd MMMM yyyy")
-                          ?? "Select a date")
+                        @SelectedDate?.ToString(
+                            "ddd, dd MMM yyyy")
                     </strong>
 
                 </div>
 
-                <div class="summary-item">
+                <div class="selected-detail">
 
-                    <span class="summary-title">
-                        Time
-                    </span>
+                    <span>Time</span>
 
                     <strong>
-                        @(SelectedTime ?? "Select a time")
+                        @SelectedTime
                     </strong>
 
                 </div>
 
-                <div class="summary-item">
+                <div class="selected-detail">
 
-                    <span class="summary-title">
-                        Time Zone
-                    </span>
+                    <span>Duration</span>
+
+                    <strong>
+                        @MeetingDuration Minutes
+                    </strong>
+
+                </div>
+
+                <div class="selected-detail">
+
+                    <span>Time Zone</span>
 
                     <strong>
                         Asia/Kolkata
@@ -174,21 +367,16 @@
 
                 </div>
 
-                <button class="book-button"
-                        disabled="@(!CanBook)">
-                    Book Meeting
-                </button>
-
-            </div>
+            </aside>
 
         </div>
-
-    </div>
+    }
 
 </div>
 
 @code
 {
+    private bool IsBooking;
     private DateTime Today = DateTime.Today;
 
     private DateTime CurrentMonth;
@@ -196,6 +384,28 @@
     private DateTime? SelectedDate;
 
     private string? SelectedTime;
+
+    private int BookingStep = 1;
+
+    private const int MeetingDuration = 60;
+
+    private string MeetingTitle = string.Empty;
+
+    private string MeetingReason = string.Empty;
+
+    private string DiscussionTopics = string.Empty;
+
+    private string AdditionalNotes = string.Empty;
+
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
+    private bool CanConfirmBooking =>
+    !IsBooking &&
+    !string.IsNullOrWhiteSpace(MeetingTitle) &&
+    !string.IsNullOrWhiteSpace(MeetingReason) &&
+    !string.IsNullOrWhiteSpace(DiscussionTopics);
 
     protected override void OnInitialized()
     {
@@ -212,7 +422,7 @@
     private bool CanBook =>
         SelectedDate.HasValue &&
         SelectedTime is not null;
-
+    
     private int StartingEmptyDays =>
         (int)CurrentMonth.DayOfWeek;
 
@@ -310,8 +520,86 @@
         SelectedTime = null;
     }
 
-    private void GoBack()
+    private void OpenMeetingDetails()
     {
+        if (!CanBook)
+            return;
+
+        BookingStep = 2;
+    }
+
+    private void BackToSchedule()
+    {
+        BookingStep = 1;
+    }
+
+    private void HandleBack()
+    {
+        if (BookingStep == 2)
+        {
+            BookingStep = 1;
+            return;
+        }
+
         Navigation.NavigateTo("/");
+    }
+
+    private async Task ConfirmBooking()
+    {
+        if (!CanConfirmBooking)
+            return;
+
+        try
+        {
+            IsBooking = true;
+
+            var meetingDetails = new MeetingDetailsDto
+            {
+                MeetingTitle = MeetingTitle,
+
+                MeetingReason = MeetingReason,
+
+                DiscussionTopics = DiscussionTopics
+                    .Split(
+                        '\n',
+                        StringSplitOptions.RemoveEmptyEntries |
+                        StringSplitOptions.TrimEntries)
+                    .ToList(),
+
+                AdditionalNotes = AdditionalNotes
+            };
+
+            var meetingDetailsJson =
+                JsonSerializer.Serialize(
+                    meetingDetails,
+                    JsonOptions);
+
+            var request = new BookMeetingsRequestDto
+            {
+                MeetingDate = SelectedDate!.Value.Date,
+
+                StartTime = TimeOnly.Parse(
+                    SelectedTime!),
+
+                DurationInMinutes = MeetingDuration,
+
+                TimeZone = "Asia/Kolkata",
+
+                MeetingDetailsJson = meetingDetailsJson
+            };
+
+            // Actual API call
+            await BookMeetings.BookMeetingAsync(request);
+
+            Navigation.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+        finally
+        {
+            IsBooking = false;
+        }
     }
 }
