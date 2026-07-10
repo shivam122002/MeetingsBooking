@@ -1,5 +1,5 @@
 ﻿@page "/"
-
+@inject NavigationManager NavigationManager
 <PageTitle>Dashboard</PageTitle>
 
 <div class="dashboard-header">
@@ -12,7 +12,7 @@
         </p>
     </div>
 
-    <button class="new-meeting-button">
+    <button class="new-meeting-button" onclick="@(() => NavigationManager.NavigateTo("/meeting-booking"))" >
         + New Meeting
     </button>
 
