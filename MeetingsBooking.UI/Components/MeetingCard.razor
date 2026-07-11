@@ -1,130 +1,135 @@
 ﻿@using MeetingsBooking.Shared.Dtos
-<div class="meeting-card">
+<div class="meeting-list">
 
-    <div class="meeting-header">
+    @foreach (var Meeting in Meetings)
+    {
+        <MeetingCard Meeting="meeting" />
+        <div class="meeting-card">
 
-        <div>
+            <div class="meeting-header">
 
-            <div class="meeting-date">
+                <div>
 
-                📅
-                @Meeting.MeetingDate.ToString("dddd, dd MMM yyyy")
+                    <div class="meeting-date">
+
+                        📅
+                        @Meeting.MeetingDate.ToString("dddd, dd MMM yyyy")
+
+                    </div>
+
+                    <h3>
+                        @Meeting.MeetingDetails.MeetingTitle
+                    </h3>
+
+                </div>
 
             </div>
 
-            <h3>
-                @Meeting.MeetingDetails.MeetingTitle
-            </h3>
+            <div class="meeting-info">
 
-        </div>
+                <div>
 
-    </div>
+                    🕑
 
-    <div class="meeting-info">
+                    @Meeting.StartTime
 
-        <div>
+                </div>
 
-            🕑
+                <div>
 
-            @Meeting.StartTime
+                    ⏱
 
-        </div>
+                    @Meeting.DurationInMinutes Minutes
 
-        <div>
+                </div>
 
-            ⏱
+                <div>
 
-            @Meeting.DurationInMinutes Minutes
+                    🌍
 
-        </div>
+                    @Meeting.TimeZone
 
-        <div>
+                </div>
 
-            🌍
+            </div>
 
-            @Meeting.TimeZone
+            <div class="meeting-actions">
 
-        </div>
+                <button @onclick="() => ToggleDetails(Meeting)">
 
-    </div>
+                    @(Meeting.IsExpanded ? "Hide Details" : "View Details")
 
-    <div class="meeting-actions">
+                </button>
 
-        <button @onclick="ToggleDetails">
+                <button>
 
-            @(ShowDetails ? "Hide Details" : "View Details")
+                    Reschedule
 
-        </button>
+                </button>
 
-        <button>
+                <button class="danger">
 
-            Reschedule
+                    Cancel
 
-        </button>
+                </button>
 
-        <button class="danger">
+            </div>
 
-            Cancel
+            @if (Meeting.IsExpanded)
+            {
+                <div class="meeting-details">
 
-        </button>
+                    <h4>Reason</h4>
 
-    </div>
+                    <p>
 
-    @if (ShowDetails)
-    {
-        <div class="meeting-details">
+                        @Meeting.MeetingDetails.MeetingReason
 
-            <h4>Reason</h4>
+                    </p>
 
-            <p>
+                    <h4>
 
-                @Meeting.MeetingDetails.MeetingReason
+                        Discussion Topics
 
-            </p>
+                    </h4>
 
-            <h4>
+                    <ul>
 
-                Discussion Topics
+                        @foreach (var topic in Meeting.MeetingDetails.DiscussionTopics)
+                        {
+                            <li>@topic</li>
+                        }
 
-            </h4>
+                    </ul>
 
-            <ul>
+                    <h4>
 
-                @foreach (var topic in Meeting.MeetingDetails.DiscussionTopics)
-                {
-                    <li>@topic</li>
-                }
+                        Additional Notes
 
-            </ul>
+                    </h4>
 
-            <h4>
+                    <p>
+                        @Meeting.MeetingDetails.AdditionalNotes
 
-                Additional Notes
+                    </p>
 
-            </h4>
-
-            <p>
-
-                @Meeting.MeetingDetails.AdditionalNotes
-
-            </p>
+                </div>
+            }
 
         </div>
     }
-
 </div>
-
 @code {
 
+    private Guid? ExpandedMeetingId;
     [Parameter]
-
-    public MeetingResponseDto Meeting { get; set; } = default!;
+    public List<MeetingResponseDto> Meetings { get; set; }
 
     private bool ShowDetails;
 
-    void ToggleDetails()
+    private void ToggleDetails(MeetingResponseDto meeting)
     {
-        ShowDetails = !ShowDetails;
+        meeting.IsExpanded = !meeting.IsExpanded;
     }
 
 }

@@ -1,36 +1,31 @@
-﻿@page "/"
+﻿@page "/my-meetings"
 @using MeetingsBooking.Shared.Dtos
 @using MeetingsBooking.UI.Components
 
 @inject IBookMeetings BookMeetings
 @inject NavigationManager Navigation
-
-<PageTitle>Meetings Dashboard</PageTitle>
-
-<div class="dashboard">
-
+<div>
     <div class="dashboard-header">
 
         <div>
 
-            <h1>Meetings Dashboard</h1>
-
+            <h1>My Meetings</h1>
             <p>
                 Manage all your scheduled meetings.
             </p>
 
         </div>
-
-        <button class="new-meeting-btn"
-                @onclick="CreateMeeting">
-
-            + New Meeting
-
-        </button>
-
     </div>
+   @if (IsLoading)
+   {
+       <p>Loading meetings...</p>
+   }
+   else
+   {
+       <br />
+       <MeetingCard Meetings="Meetings" />
+   }
 </div>
-
 @code{
 
     private bool IsLoading = true;
@@ -44,10 +39,5 @@
         Meetings = (await BookMeetings.GetAllMeetingsAsync()).ToList();
 
         IsLoading = false;
-    }
-
-    void CreateMeeting()
-    {
-        Navigation.NavigateTo("/meeting-booking");
     }
 }

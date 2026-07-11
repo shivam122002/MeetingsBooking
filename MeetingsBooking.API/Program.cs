@@ -16,12 +16,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("UI", policy =>
+    options.AddPolicy("UI", builder =>
     {
-        policy
+        builder
             .AllowAnyOrigin()
-            .AllowAnyMethod()
-            .AllowAnyHeader();
+            .AllowAnyHeader()
+            .AllowAnyMethod();
     });
 });
 var app = builder.Build();
