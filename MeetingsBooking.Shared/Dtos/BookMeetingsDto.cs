@@ -21,6 +21,7 @@ namespace MeetingsBooking.Shared.Dtos
         public MeetingDetailsDto MeetingDetails { get; set; } = new();
 
         public DateTime CreatedAt { get; set; }
+        public bool IsExpanded { get; set; }
     }
     public class BookMeetingsRequestDto
     {
