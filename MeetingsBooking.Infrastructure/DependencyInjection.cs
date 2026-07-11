@@ -1,4 +1,5 @@
-﻿using MeetingsBooking.Infrastructure.Persistence;
+﻿using MeetingsBooking.Application.Interfaces.Repositories;
+using MeetingsBooking.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +19,10 @@ public static class DependencyInjection
         services.AddDbContext<MeetingsBookingDbContext>(
             options =>
                 options.UseSqlServer(connectionString));
+
+        services.AddScoped<
+            IMeetingRepository,
+            MeetingRepository>();
 
         return services;
     }
