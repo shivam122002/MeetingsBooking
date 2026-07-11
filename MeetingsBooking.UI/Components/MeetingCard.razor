@@ -1,20 +1,17 @@
 ﻿@using MeetingsBooking.Shared.Dtos
+@inject NavigationManager Navigation
 <div class="meeting-list">
 
     @foreach (var Meeting in Meetings)
     {
         <MeetingCard Meeting="meeting" />
         <div class="meeting-card">
-
             <div class="meeting-header">
-
                 <div>
-
                     <div class="meeting-date">
 
                         📅
                         @Meeting.MeetingDate.ToString("dddd, dd MMM yyyy")
-
                     </div>
 
                     <h3>
@@ -52,32 +49,6 @@
                 </div>
 
             </div>
-
-            @* <div class="meeting-actions">
-
-                <button @onclick="() => ToggleDetails(Meeting)">
-
-                    @(Meeting.IsExpanded ? "Hide Details" : "View Details")
-
-                </button>
-
-                <button>
-
-                    Reschedule
-
-                </button>
-
-                <button class="danger">
-                    Cancel
-                </button>
-                <a href="@GetMeetingUrl(Meeting.Id)"
-                   target="_blank"
-                   class="join-button @(CanJoinMeeting(Meeting) ? "" : "disabled")">
-                    <i class="fas fa-video"></i>
-                    Join Meeting
-                </a>
-
-            </div> *@
             <div class="meeting-actions">
 
             <div class="left-actions">
@@ -107,15 +78,18 @@
             </div>
             <div class="right-actions">
 
-                <button class="join-btn"
+               @*  <button class="join-btn"
                         disabled="@(!CanJoinMeeting(Meeting))">
                     <i class="bi bi-camera-video-fill"></i>
                     Join Meeting
 
-                </button>
-
+                </button> *@
+                    <button class="join-btn"
+                            @onclick="() => HandleJoinMeeting(Meeting.Id)">
+                        <i class="bi bi-camera-video-fill"></i>
+                        Join Meeting
+                    </button>
             </div>
-
 </div>
             @if (Meeting.IsExpanded)
             {
@@ -179,16 +153,20 @@
         return $"https://meet.myapp.com/{id}";
     }
     private bool CanJoinMeeting(MeetingResponseDto meeting)
-{
-    var start = meeting.MeetingDate.Date +
-                meeting.StartTime.ToTimeSpan();
+    {
+        var start = meeting.MeetingDate.Date +
+                    meeting.StartTime.ToTimeSpan();
 
-    var joinFrom = start.AddMinutes(-10);
+        var joinFrom = start.AddMinutes(-10);
 
-    var meetingEnds = start.AddMinutes(
-        meeting.DurationInMinutes);
+        var meetingEnds = start.AddMinutes(
+            meeting.DurationInMinutes);
 
-    return DateTime.Now >= joinFrom
-        && DateTime.Now <= meetingEnds;
-}
+        return DateTime.Now >= joinFrom
+            && DateTime.Now <= meetingEnds;
+    }
+    private void HandleJoinMeeting(Guid MeetingId)
+    {
+        Navigation.NavigateTo($"/meeting-room/{MeetingId}");
+    }
 }

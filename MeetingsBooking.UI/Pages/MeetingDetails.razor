@@ -1,6 +1,7 @@
 ﻿@page "/my-meetings"
 @using MeetingsBooking.Shared.Dtos
 @using MeetingsBooking.UI.Components
+@using MeetingsBooking.Domain.Enums
 @using MeetingsBooking.Shared.Enums
 @inject IBookMeetings BookMeetings
 @inject NavigationManager Navigation
@@ -79,29 +80,23 @@
     };
     private bool IsUpcoming(MeetingResponseDto meeting)
     {
-        var meetingDateTime =
-            meeting.MeetingDate.Date +
-            meeting.StartTime.ToTimeSpan();
-
-        return meetingDateTime > DateTime.Now;
+        return meeting.Status == MeetingStatus.Scheduled
+            || meeting.Status == MeetingStatus.Accepted;
     }
 
     private bool IsPast(MeetingResponseDto meeting)
     {
-        var meetingDateTime =
-            meeting.MeetingDate.Date +
-            meeting.StartTime.ToTimeSpan();
-
-        return meetingDateTime < DateTime.Now;
+        return meeting.Status == MeetingStatus.Completed
+            || meeting.Status == MeetingStatus.Expired;
     }
 
     private bool IsPending(MeetingResponseDto meeting)
     {
-        return false;
+        return meeting.Status == MeetingStatus.Pending;
     }
 
     private bool IsCancelled(MeetingResponseDto meeting)
     {
-        return false;
+        return meeting.Status == MeetingStatus.Cancelled;
     }
 }

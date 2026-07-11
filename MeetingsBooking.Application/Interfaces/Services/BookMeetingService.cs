@@ -1,6 +1,7 @@
 ﻿using MeetingsBooking.Application.Interfaces.Repositories;
 using MeetingsBooking.Application.Interfaces.Services;
 using MeetingsBooking.Domain.Entities;
+using MeetingsBooking.Domain.Enums;
 using MeetingsBooking.Shared.Dtos;
 using System.Text.Json;
 
@@ -34,6 +35,8 @@ public class BookMeetingService : IBookMeetingService
 
             MeetingDetailsJson = request.MeetingDetailsJson,
 
+            Status = MeetingStatus.Scheduled,
+
             CreatedAt = DateTime.UtcNow
         };
 
@@ -63,7 +66,7 @@ public class BookMeetingService : IBookMeetingService
             TimeZone = x.TimeZone,
 
             CreatedAt = x.CreatedAt,
-
+            Status = x.Status,
             MeetingDetails = JsonSerializer.Deserialize<MeetingDetailsDto>(
                             x.MeetingDetailsJson,
                             JsonOptions)!
@@ -95,7 +98,7 @@ public class BookMeetingService : IBookMeetingService
             TimeZone = meeting.TimeZone,
 
             CreatedAt = meeting.CreatedAt,
-
+            Status = meeting.Status,
             MeetingDetails =
                 JsonSerializer.Deserialize<MeetingDetailsDto>(
                     meeting.MeetingDetailsJson)!

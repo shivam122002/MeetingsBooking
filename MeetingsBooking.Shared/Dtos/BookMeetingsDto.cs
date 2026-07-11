@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MeetingsBooking.Domain.Enums;
 
 namespace MeetingsBooking.Shared.Dtos
 {
@@ -19,7 +15,7 @@ namespace MeetingsBooking.Shared.Dtos
         public string TimeZone { get; set; } = string.Empty;
 
         public MeetingDetailsDto MeetingDetails { get; set; } = new();
-
+        public MeetingStatus Status { get; set; }
         public DateTime CreatedAt { get; set; }
         public bool IsExpanded { get; set; }
     }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MeetingsBooking.Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,6 +18,8 @@ namespace MeetingsBooking.Domain.Entities
         public int DurationInMinutes { get; set; }
 
         public string TimeZone { get; set; } = string.Empty;
+
+        public MeetingStatus Status { get; set; } = MeetingStatus.Pending;
 
         public string MeetingDetailsJson { get; set; } = string.Empty;
 
