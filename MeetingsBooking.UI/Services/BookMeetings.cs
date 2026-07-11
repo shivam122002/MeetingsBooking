@@ -4,6 +4,7 @@ using System.Net.Http.Json;
 public interface IBookMeetings
 {
     Task<BookMeetingsResponse> BookMeetingAsync(BookMeetingsRequestDto request);
+    Task<List<MeetingResponseDto>> GetAllMeetingsAsync();
 }
 public class BookMeetings : IBookMeetings
 {
@@ -45,6 +46,28 @@ public class BookMeetings : IBookMeetings
                 IsSuccess = false,
                 Message = ex.Message
             };
+        }
+    }
+    public async Task<List<MeetingResponseDto>> GetAllMeetingsAsync()
+    {
+        try
+        {
+            var meetings = await _httpClient.GetFromJsonAsync<List<MeetingResponseDto>>(
+                "api/meetings/getAllmeetings");
+
+            return meetings ?? new List<MeetingResponseDto>();
+        }
+        catch (HttpRequestException ex)
+        {
+            Console.WriteLine(ex.Message);
+
+            return new List<MeetingResponseDto>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+
+            return new List<MeetingResponseDto>();
         }
     }
 }

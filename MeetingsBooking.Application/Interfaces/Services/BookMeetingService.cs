@@ -2,6 +2,7 @@
 using MeetingsBooking.Application.Interfaces.Services;
 using MeetingsBooking.Domain.Entities;
 using MeetingsBooking.Shared.Dtos;
+using System.Text.Json;
 
 namespace MeetingsBooking.Application.Services;
 
@@ -42,4 +43,66 @@ public class BookMeetingService : IBookMeetingService
 
         return meeting.Id;
     }
+
+    public async Task<IEnumerable<MeetingResponseDto>> GetAllAsync(
+    CancellationToken cancellationToken)
+    {
+        var meetings = await _meetingRepository.GetAllAsync(
+            cancellationToken);
+
+        return meetings.Select(x => new MeetingResponseDto
+        {
+            Id = x.Id,
+
+            MeetingDate = x.MeetingDate,
+
+            StartTime = x.StartTime,
+
+            DurationInMinutes = x.DurationInMinutes,
+
+            TimeZone = x.TimeZone,
+
+            CreatedAt = x.CreatedAt,
+
+            MeetingDetails = JsonSerializer.Deserialize<MeetingDetailsDto>(
+                            x.MeetingDetailsJson,
+                            JsonOptions)!
+        });
+    }
+
+    public async Task<MeetingResponseDto?> GetByIdAsync(
+     Guid id,
+     CancellationToken cancellationToken)
+    {
+        var meeting =
+            await _meetingRepository.GetByIdAsync(
+                id,
+                cancellationToken);
+
+        if (meeting == null)
+            return null;
+
+        return new MeetingResponseDto
+        {
+            Id = meeting.Id,
+
+            MeetingDate = meeting.MeetingDate,
+
+            StartTime = meeting.StartTime,
+
+            DurationInMinutes = meeting.DurationInMinutes,
+
+            TimeZone = meeting.TimeZone,
+
+            CreatedAt = meeting.CreatedAt,
+
+            MeetingDetails =
+                JsonSerializer.Deserialize<MeetingDetailsDto>(
+                    meeting.MeetingDetailsJson)!
+        };
+    }
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
 }

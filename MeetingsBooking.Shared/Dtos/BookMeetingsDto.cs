@@ -6,6 +6,22 @@ using System.Threading.Tasks;
 
 namespace MeetingsBooking.Shared.Dtos
 {
+    public class MeetingResponseDto
+    {
+        public Guid Id { get; set; }
+
+        public DateTime MeetingDate { get; set; }
+
+        public TimeOnly StartTime { get; set; }
+
+        public int DurationInMinutes { get; set; }
+
+        public string TimeZone { get; set; } = string.Empty;
+
+        public MeetingDetailsDto MeetingDetails { get; set; } = new();
+
+        public DateTime CreatedAt { get; set; }
+    }
     public class BookMeetingsRequestDto
     {
         public DateTime MeetingDate { get; set; }
