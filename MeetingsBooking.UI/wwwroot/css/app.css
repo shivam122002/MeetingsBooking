@@ -800,3 +800,98 @@ body {
         width: 100%;
     }
 }
+.meeting-filter-bar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 25px 0 35px;
+}
+
+.filter-button {
+    border: none;
+    background: white;
+    border: 1px solid #dbe3ec;
+    padding: 12px 20px;
+    border-radius: 40px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: .25s;
+}
+
+    .filter-button:hover {
+        background: #eff6ff;
+    }
+
+    .filter-button.active {
+        background: #2563eb;
+        color: white;
+    }
+
+.filter-count {
+    margin-left: 5px;
+    opacity: .8;
+}
+/*.join-button.disabled {
+    pointer-events: none;
+    opacity: .5;
+    cursor: not-allowed;
+}*/
+.meeting-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.left-actions {
+    display: flex;
+    gap: 14px;
+}
+
+.right-actions {
+    margin-left: auto;
+}
+
+.primary-btn,
+.warning-btn,
+.danger-btn,
+.join-btn {
+    border: none;
+    padding: 12px 22px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: .25s;
+}
+
+.primary-btn {
+    background: #2563eb;
+    color: white;
+}
+
+.warning-btn {
+    background: #f59e0b;
+    color: white;
+}
+
+.danger-btn {
+    background: #ef4444;
+    color: white;
+}
+
+.join-btn {
+    background: #16a34a;
+    color: white;
+}
+.join-btn:disabled {
+    background: #6b7280;
+    color: dimgray;
+    cursor: not-allowed;
+}
+.meeting-actions i {
+    font-size: 16px;
+}

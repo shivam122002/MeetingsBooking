@@ -1,0 +1,86 @@
+﻿@using MeetingsBooking.Shared.Enums
+
+<div class="meeting-filter-bar">
+
+    @foreach (var filter in Enum.GetValues<MeetingFilter>())
+    {
+        <button class="@GetButtonClass(filter)"
+                @onclick="() => OnFilterSelected(filter)">
+
+            @GetFilterTitle(filter)
+
+            <span class="filter-count">
+                (@GetCount(filter))
+            </span>
+
+        </button>
+    }
+
+</div>
+
+@code {
+
+    [Parameter]
+    public MeetingFilter SelectedFilter { get; set; }
+
+    [Parameter]
+    public EventCallback<MeetingFilter> SelectedFilterChanged { get; set; }
+
+    [Parameter]
+    public int AllCount { get; set; }
+
+    [Parameter]
+    public int UpcomingCount { get; set; }
+
+    [Parameter]
+    public int PendingCount { get; set; }
+
+    [Parameter]
+    public int PastCount { get; set; }
+
+    [Parameter]
+    public int CancelledCount { get; set; }
+
+    private async Task OnFilterSelected(
+        MeetingFilter filter)
+    {
+        await SelectedFilterChanged.InvokeAsync(filter);
+    }
+
+    private string GetButtonClass(
+        MeetingFilter filter)
+    {
+        return SelectedFilter == filter
+            ? "filter-button active"
+            : "filter-button";
+    }
+
+    private string GetFilterTitle(
+        MeetingFilter filter)
+    {
+        return filter switch
+        {
+            MeetingFilter.All => "All",
+            MeetingFilter.Upcoming => "Upcoming",
+            MeetingFilter.Pending => "Pending",
+            MeetingFilter.Past => "Past",
+            MeetingFilter.Cancelled => "Cancelled",
+            _ => filter.ToString()
+        };
+    }
+
+    private int GetCount(
+        MeetingFilter filter)
+    {
+        return filter switch
+        {
+            MeetingFilter.All => AllCount,
+            MeetingFilter.Upcoming => UpcomingCount,
+            MeetingFilter.Pending => PendingCount,
+            MeetingFilter.Past => PastCount,
+            MeetingFilter.Cancelled => CancelledCount,
+            _ => 0
+        };
+    }
+
+}
