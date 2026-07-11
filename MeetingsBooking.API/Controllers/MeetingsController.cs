@@ -38,5 +38,22 @@ namespace MeetingsBooking.API.Controllers
                     meetingId
                 });
         }
+        [HttpGet("getAllmeetings")]
+        public async Task<IActionResult> GetAllMeetings(CancellationToken cancellationToken)
+        {
+            var meetings = await _bookMeetingService.GetAllAsync(cancellationToken);
+            return Ok(meetings);
+        }
+        [HttpGet("get-meeting/{id}")]
+        public async Task<IActionResult> GetMeeting([FromRoute] Guid id,CancellationToken cancellationToken)
+        {
+            var meeting = await _bookMeetingService.GetByIdAsync(id, cancellationToken);
+            if (meeting == null)
+            {
+                return NotFound();
+            }
+            return Ok(meeting);
+        }   
     }
 }
+

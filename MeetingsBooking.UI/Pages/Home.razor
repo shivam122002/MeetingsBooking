@@ -1,19 +1,72 @@
 ﻿@page "/"
-@inject NavigationManager NavigationManager
-<PageTitle>Dashboard</PageTitle>
+@using MeetingsBooking.Shared.Dtos
 
-<div class="dashboard-header">
+@inject IBookMeetings BookMeetings
+@inject NavigationManager Navigation
+<PageTitle>Meetings Dashboard</PageTitle>
 
-    <div>
-        <h1>Dashboard</h1>
+<div class="dashboard">
 
-        <p>
-            Welcome back, Shivam. Here's what's happening today.
-        </p>
+    <div class="dashboard-header">
+
+        <div>
+
+            <h1>Meetings Dashboard</h1>
+
+            <p>
+                Manage all your scheduled meetings.
+            </p>
+
+        </div>
+
+        <button class="new-meeting-btn"
+                @onclick="CreateMeeting">
+
+            + New Meeting
+
+        </button>
+
     </div>
 
-    <button class="new-meeting-button" onclick="@(() => NavigationManager.NavigateTo("/meeting-booking"))" >
-        + New Meeting
-    </button>
+    @if (IsLoading)
+    {
+        <p>Loading meetings...</p>
+    }
+    else if (!Meetings.Any())
+    {
+        <p>No meetings found.</p>
+    }
+    else
+    {
+        <div class="meeting-list">
+
+            @foreach (var meeting in Meetings)
+            {
+                <MeetingCard Meeting="meeting" />
+            }
+        </div>
+    }
 
 </div>
+
+@code{
+
+    private bool IsLoading = true;
+
+    private List<MeetingResponseDto> Meetings = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsLoading = true;
+
+        Meetings = (await BookMeetings.GetAllMeetingsAsync()).ToList();
+
+        IsLoading = false;
+    }
+
+    void CreateMeeting()
+    {
+        Navigation.NavigateTo("/meeting-booking");
+    }
+
+}

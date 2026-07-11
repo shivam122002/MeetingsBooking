@@ -1,0 +1,130 @@
+﻿@using MeetingsBooking.Shared.Dtos
+<div class="meeting-card">
+
+    <div class="meeting-header">
+
+        <div>
+
+            <div class="meeting-date">
+
+                📅
+                @Meeting.MeetingDate.ToString("dddd, dd MMM yyyy")
+
+            </div>
+
+            <h3>
+                @Meeting.MeetingDetails.MeetingTitle
+            </h3>
+
+        </div>
+
+    </div>
+
+    <div class="meeting-info">
+
+        <div>
+
+            🕑
+
+            @Meeting.StartTime
+
+        </div>
+
+        <div>
+
+            ⏱
+
+            @Meeting.DurationInMinutes Minutes
+
+        </div>
+
+        <div>
+
+            🌍
+
+            @Meeting.TimeZone
+
+        </div>
+
+    </div>
+
+    <div class="meeting-actions">
+
+        <button @onclick="ToggleDetails">
+
+            @(ShowDetails ? "Hide Details" : "View Details")
+
+        </button>
+
+        <button>
+
+            Reschedule
+
+        </button>
+
+        <button class="danger">
+
+            Cancel
+
+        </button>
+
+    </div>
+
+    @if (ShowDetails)
+    {
+        <div class="meeting-details">
+
+            <h4>Reason</h4>
+
+            <p>
+
+                @Meeting.MeetingDetails.MeetingReason
+
+            </p>
+
+            <h4>
+
+                Discussion Topics
+
+            </h4>
+
+            <ul>
+
+                @foreach (var topic in Meeting.MeetingDetails.DiscussionTopics)
+                {
+                    <li>@topic</li>
+                }
+
+            </ul>
+
+            <h4>
+
+                Additional Notes
+
+            </h4>
+
+            <p>
+
+                @Meeting.MeetingDetails.AdditionalNotes
+
+            </p>
+
+        </div>
+    }
+
+</div>
+
+@code {
+
+    [Parameter]
+
+    public MeetingResponseDto Meeting { get; set; } = default!;
+
+    private bool ShowDetails;
+
+    void ToggleDetails()
+    {
+        ShowDetails = !ShowDetails;
+    }
+
+}
