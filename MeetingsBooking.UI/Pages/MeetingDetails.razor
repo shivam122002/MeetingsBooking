@@ -1,14 +1,13 @@
 ﻿@page "/my-meetings"
 @using MeetingsBooking.Shared.Dtos
 @using MeetingsBooking.UI.Components
-
+@using MeetingsBooking.Shared.Enums
 @inject IBookMeetings BookMeetings
 @inject NavigationManager Navigation
 <div>
     <div class="dashboard-header">
 
         <div>
-
             <h1>My Meetings</h1>
             <p>
                 Manage all your scheduled meetings.
@@ -22,8 +21,15 @@
    }
    else
    {
+        <MeetingFilterBar SelectedFilter="@SelectedFilter"
+                          SelectedFilterChanged="ChangeFilter"
+                          AllCount="@Meetings.Count"
+                          UpcomingCount="@UpcomingCount"
+                          PendingCount="@PendingCount"
+                          PastCount="@PastCount"
+                          CancelledCount="@CancelledCount" />
        <br />
-       <MeetingCard Meetings="Meetings" />
+        <MeetingCard Meetings="FilteredMeetings.ToList()" />
    }
 </div>
 @code{
@@ -31,7 +37,17 @@
     private bool IsLoading = true;
 
     private List<MeetingResponseDto> Meetings = [];
+    private int UpcomingCount =>
+    Meetings.Count(IsUpcoming);
 
+    private int PendingCount =>
+        Meetings.Count(IsPending);
+
+    private int PastCount =>
+        Meetings.Count(IsPast);
+
+    private int CancelledCount =>
+        Meetings.Count(IsCancelled);
     protected override async Task OnInitializedAsync()
     {
         IsLoading = true;
@@ -39,5 +55,53 @@
         Meetings = (await BookMeetings.GetAllMeetingsAsync()).ToList();
 
         IsLoading = false;
+    }
+    private MeetingFilter SelectedFilter = MeetingFilter.All;
+
+    private void ChangeFilter(MeetingFilter filter)
+    {
+        SelectedFilter = filter;
+    }
+    private IEnumerable<MeetingResponseDto> FilteredMeetings =>
+    SelectedFilter switch
+    {
+        MeetingFilter.All => Meetings,
+
+        MeetingFilter.Upcoming => Meetings.Where(IsUpcoming),
+
+        MeetingFilter.Pending => Meetings.Where(IsPending),
+
+        MeetingFilter.Past => Meetings.Where(IsPast),
+
+        MeetingFilter.Cancelled => Meetings.Where(IsCancelled),
+
+        _ => Meetings
+    };
+    private bool IsUpcoming(MeetingResponseDto meeting)
+    {
+        var meetingDateTime =
+            meeting.MeetingDate.Date +
+            meeting.StartTime.ToTimeSpan();
+
+        return meetingDateTime > DateTime.Now;
+    }
+
+    private bool IsPast(MeetingResponseDto meeting)
+    {
+        var meetingDateTime =
+            meeting.MeetingDate.Date +
+            meeting.StartTime.ToTimeSpan();
+
+        return meetingDateTime < DateTime.Now;
+    }
+
+    private bool IsPending(MeetingResponseDto meeting)
+    {
+        return false;
+    }
+
+    private bool IsCancelled(MeetingResponseDto meeting)
+    {
+        return false;
     }
 }

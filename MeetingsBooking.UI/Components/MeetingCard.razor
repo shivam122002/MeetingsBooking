@@ -53,7 +53,7 @@
 
             </div>
 
-            <div class="meeting-actions">
+            @* <div class="meeting-actions">
 
                 <button @onclick="() => ToggleDetails(Meeting)">
 
@@ -68,13 +68,55 @@
                 </button>
 
                 <button class="danger">
+                    Cancel
+                </button>
+                <a href="@GetMeetingUrl(Meeting.Id)"
+                   target="_blank"
+                   class="join-button @(CanJoinMeeting(Meeting) ? "" : "disabled")">
+                    <i class="fas fa-video"></i>
+                    Join Meeting
+                </a>
 
+            </div> *@
+            <div class="meeting-actions">
+
+            <div class="left-actions">
+
+                <button @onclick="() => ToggleDetails(Meeting)"
+                        class="primary-btn">
+
+                    <i class="bi bi-eye-fill"></i>
+                    @(Meeting.IsExpanded ? "Hide Details" : "View Details")
+
+                </button>
+
+                <button class="warning-btn">
+
+                    <i class="bi bi-pencil-square"></i>
+                    Reschedule
+
+                </button>
+
+                <button class="danger-btn">
+
+                    <i class="bi bi-x-circle-fill"></i>
                     Cancel
 
                 </button>
 
             </div>
+            <div class="right-actions">
 
+                <button class="join-btn"
+                        disabled="@(!CanJoinMeeting(Meeting))">
+                    <i class="bi bi-camera-video-fill"></i>
+                    Join Meeting
+
+                </button>
+
+            </div>
+
+</div>
             @if (Meeting.IsExpanded)
             {
                 <div class="meeting-details">
@@ -131,5 +173,22 @@
     {
         meeting.IsExpanded = !meeting.IsExpanded;
     }
+    public string JoinMeetingUrl { get; set; } = string.Empty;
+    private string GetMeetingUrl(Guid id)
+    {
+        return $"https://meet.myapp.com/{id}";
+    }
+    private bool CanJoinMeeting(MeetingResponseDto meeting)
+{
+    var start = meeting.MeetingDate.Date +
+                meeting.StartTime.ToTimeSpan();
 
+    var joinFrom = start.AddMinutes(-10);
+
+    var meetingEnds = start.AddMinutes(
+        meeting.DurationInMinutes);
+
+    return DateTime.Now >= joinFrom
+        && DateTime.Now <= meetingEnds;
+}
 }
