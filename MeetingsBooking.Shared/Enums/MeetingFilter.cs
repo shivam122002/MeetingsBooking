@@ -14,4 +14,5 @@ namespace MeetingsBooking.Shared.Enums
         Past,
         Cancelled
     }
+    
 }
