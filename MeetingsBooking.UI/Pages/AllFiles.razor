@@ -1,0 +1,494 @@
+﻿@page "/all-files"
+@using Microsoft.AspNetCore.Components.Forms
+@using MeetingsBooking.UI.Services
+@inject IFileUploader fileUploader
+<PageTitle>My Files</PageTitle>
+
+<div class="files-page">
+
+    <div class="page-header">
+        <div>
+            <h1>📁 My Files</h1>
+            <p>Manage files uploaded to Azure Blob Storage</p>
+        </div>
+
+        <a href="/file-uploader" class="upload-new-btn">
+            + Upload New File
+        </a>
+    </div>
+
+
+    @if (isLoading)
+    {
+        <div class="loading-container">
+
+            <div class="spinner-border text-primary"
+                 role="status">
+            </div>
+
+            <p>Loading files...</p>
+
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="error-message">
+            ❌ @errorMessage
+        </div>
+    }
+    else if (files.Count == 0)
+    {
+        <div class="empty-state">
+
+            <div class="empty-icon">
+                📂
+            </div>
+
+            <h3>No files uploaded</h3>
+
+            <p>
+                Upload your first file to Azure Blob Storage.
+            </p>
+
+            <a href="/file-uploader"
+               class="empty-upload-btn">
+
+                Upload File
+
+            </a>
+
+        </div>
+    }
+    else
+    {
+        <div class="files-summary">
+
+            <span>
+                @files.Count @(files.Count == 1 ? "file" : "files")
+            </span>
+
+        </div>
+
+
+        <div class="files-grid">
+
+            @foreach (var file in files)
+            {
+                <div class="file-card">
+
+                    <div class="file-card-header">
+
+                        <div class="file-icon">
+                            @GetFileIcon(file)
+                        </div>
+
+                        <div class="file-type">
+                            @GetFileExtension(file)
+                        </div>
+
+                    </div>
+
+
+                    <div class="file-info">
+
+                        <h3 title="@file">
+                            @file
+                        </h3>
+
+                        <p>
+                            Azure Blob Storage
+                        </p>
+
+                    </div>
+
+
+                    <div class="file-actions">
+
+                        <button type="button"
+                                class="download-btn"
+                                @onclick="() => DownloadFile(file)">
+
+                            ⬇ Download
+
+                        </button>
+
+
+                        <button type="button"
+                                class="delete-btn"
+                                @onclick="() => DeleteFile(file)">
+
+                            🗑 Delete
+
+                        </button>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+
+</div>
+
+
+<style>
+
+    .files-page {
+        min-height: 100vh;
+        background: #f4f7fb;
+        padding: 40px;
+    }
+
+
+    .page-header {
+        max-width: 1200px;
+        margin: 0 auto 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+    }
+
+
+    .page-header h1 {
+        margin: 0;
+        font-size: 32px;
+        font-weight: 700;
+        color: #202124;
+    }
+    .page-header p {
+        margin: 7px 0 0;
+        color: #777;
+    }
+    .upload-new-btn {
+        background: #6c63ff;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 9px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: 0.3s;
+    }
+    .upload-new-btn:hover {
+        background: #5148e5;
+        color: white;
+        transform: translateY(-2px);
+    }
+    .files-summary {
+        max-width: 1200px;
+        margin: 0 auto 15px;
+        color: #666;
+        font-size: 14px;
+        font-weight: 500;
+    }
+    .files-grid {
+        max-width: 1200px;
+        margin: auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+    }
+
+
+    .file-card {
+        background: white;
+        border-radius: 14px;
+        padding: 22px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.06);
+        transition: 0.3s;
+        border: 1px solid #eee;
+    }
+
+
+    .file-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+    }
+
+
+    .file-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+
+    .file-icon {
+        font-size: 45px;
+    }
+
+
+    .file-type {
+        background: #f0efff;
+        color: #6c63ff;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+
+    .file-info {
+        margin-bottom: 20px;
+    }
+
+
+    .file-info h3 {
+        margin: 0;
+        color: #292929;
+        font-size: 16px;
+        font-weight: 600;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+
+    .file-info p {
+        margin: 7px 0 0;
+        color: #999;
+        font-size: 13px;
+    }
+
+
+    .file-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+
+    .download-btn,
+    .delete-btn {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: 0.2s;
+    }
+
+
+    .download-btn {
+        background: #eeeefe;
+        color: #6c63ff;
+    }
+
+
+    .download-btn:hover {
+        background: #6c63ff;
+        color: white;
+    }
+
+
+    .delete-btn {
+        background: #ffeaea;
+        color: #e53935;
+    }
+
+
+    .delete-btn:hover {
+        background: #e53935;
+        color: white;
+    }
+
+
+    .loading-container {
+        min-height: 400px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        color: #777;
+    }
+
+
+    .empty-state {
+        max-width: 500px;
+        margin: 80px auto;
+        background: white;
+        padding: 50px;
+        border-radius: 16px;
+        text-align: center;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+    }
+
+
+    .empty-icon {
+        font-size: 70px;
+        margin-bottom: 15px;
+    }
+
+
+    .empty-state h3 {
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+
+    .empty-state p {
+        color: #777;
+        margin-bottom: 25px;
+    }
+
+
+    .empty-upload-btn {
+        display: inline-block;
+        background: #6c63ff;
+        color: white;
+        padding: 11px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+
+    .empty-upload-btn:hover {
+        background: #5148e5;
+        color: white;
+    }
+
+
+    .error-message {
+        max-width: 800px;
+        margin: 40px auto;
+        background: #ffe5e5;
+        color: #b71c1c;
+        padding: 15px;
+        border-radius: 10px;
+        text-align: center;
+    }
+
+
+    @@media (max-width: 700px) {
+
+        .files-page {
+            padding: 20px;
+        }
+
+
+        .page-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+
+        .upload-new-btn {
+            text-align: center;
+        }
+
+
+        .files-grid {
+            grid-template-columns: 1fr;
+        }
+
+    }
+
+</style>
+
+
+@code
+{
+    private List<string> files = new();
+
+    private bool isLoading = true;
+
+    private string? errorMessage;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadFiles();
+    }
+
+
+    private async Task LoadFiles()
+    {
+        isLoading = true;
+
+        errorMessage = null;
+
+
+        try
+        {
+            files = await fileUploader.ListFilesAsync();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Unable to load files: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+    private async Task DeleteFile(string fileName)
+    {
+        try
+        {
+           // await AzureBlobStorageService.DeleteFileAsync(fileName);
+
+            files.Remove(fileName);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Unable to delete file: {ex.Message}";
+        }
+    }
+    private async Task DownloadFile(string fileName)
+    {
+        try
+        {
+            // Stream fileStream =
+            //     await AzureBlobStorageService.DownloadFileAsync(fileName);
+
+            // We will implement browser download next.
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Unable to download file: {ex.Message}";
+        }
+    }
+    private static string GetFileExtension(string fileName)
+    {
+        string extension = Path.GetExtension(fileName);
+
+        if (string.IsNullOrWhiteSpace(extension))
+            return "FILE";
+
+        return extension.TrimStart('.');
+    }
+    private static string GetFileIcon(string fileName)
+    {
+        string extension =
+            Path.GetExtension(fileName).ToLowerInvariant();
+
+
+        return extension switch
+        {
+            ".pdf" => "📕",
+
+            ".doc" or ".docx" => "📘",
+
+            ".xls" or ".xlsx" => "📗",
+
+            ".ppt" or ".pptx" => "📙",
+
+            ".png" or ".jpg" or ".jpeg" or ".gif" => "🖼️",
+
+            ".zip" or ".rar" => "🗜️",
+
+            ".txt" => "📝",
+
+            ".mp4" or ".mkv" => "🎬",
+
+            ".mp3" or ".wav" => "🎵",
+
+            _ => "📄"
+        };
+    }
+}

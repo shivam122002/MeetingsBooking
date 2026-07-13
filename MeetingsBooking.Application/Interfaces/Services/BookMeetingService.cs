@@ -16,7 +16,6 @@ public class BookMeetingService : IBookMeetingService
     {
         _meetingRepository = meetingRepository;
     }
-
     public async Task<Guid> BookMeetingAsync(
         BookMeetingsRequestDto request,
         CancellationToken cancellationToken = default)

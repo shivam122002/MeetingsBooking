@@ -9,10 +9,8 @@ public static class DependencyInjection
     public static IServiceCollection AddApplication(
         this IServiceCollection services)
     {
-        services.AddScoped<
-            IBookMeetingService,
-            BookMeetingService>();
-
+        services.AddScoped<IBookMeetingService,BookMeetingService>();
+        services.AddScoped<IAzureBlobStorageService, AzureBlobStorageService>();
         return services;
     }
 }

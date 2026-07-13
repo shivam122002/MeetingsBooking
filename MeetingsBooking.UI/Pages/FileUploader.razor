@@ -1,0 +1,471 @@
+﻿@page "/file-uploader"
+@using Microsoft.AspNetCore.Components.Forms
+@using MeetingsBooking.UI.Services
+@inject IFileUploader fileUploader
+
+<PageTitle>File Uploader</PageTitle>
+
+<div class="upload-page">
+
+    <div class="upload-card">
+
+        <div class="upload-header">
+            <h2>📁 File Uploader</h2>
+            <p>Select a file to upload to Azure Blob Storage</p>
+        </div>
+
+
+        @*
+            IMPORTANT
+
+            Never conditionally remove InputFile.
+
+            IBrowserFile internally depends on this input element.
+        *@
+
+        <label class="upload-zone @(selectedFile != null ? "file-selected" : "")">
+
+            <InputFile OnChange="HandleFileSelected"
+                       class="file-input"
+                       accept=".pdf,.docx,.png,.jpg,.jpeg" />
+
+            @if (selectedFile == null)
+            {
+                <div class="upload-icon">
+                    ☁️
+                </div>
+
+                <h4>Choose a file</h4>
+
+                <p>Click here to browse your files</p>
+
+                <span>PDF, DOCX, PNG, JPG</span>
+            }
+            else
+            {
+                <div class="change-file-content">
+
+                    <div class="upload-icon">
+                        🔄
+                    </div>
+
+                    <h4>Change File</h4>
+
+                    <p>Click here to select another file</p>
+
+                </div>
+            }
+
+        </label>
+
+
+        @if (selectedFile != null)
+        {
+            <div class="file-preview">
+
+                <div class="file-icon">
+                    @GetFileIcon(selectedFile.Name)
+                </div>
+
+
+                <div class="file-details">
+
+                    <h5>
+                        @selectedFile.Name
+                    </h5>
+
+                    <p>
+                        @GetFileSize(selectedFile.Size)
+                    </p>
+
+                </div>
+
+
+                <button type="button"
+                        class="remove-btn"
+                        @onclick="RemoveFile">
+
+                    ✕
+
+                </button>
+
+            </div>
+
+
+            @if (isUploading)
+            {
+                <div class="progress-container">
+
+                    <div class="progress">
+
+                        <div class="progress-bar progress-bar-striped progress-bar-animated"
+                             style="width: 100%">
+
+                        </div>
+
+                    </div>
+
+                    <p>
+                        Uploading to Azure Blob Storage...
+                    </p>
+
+                </div>
+            }
+
+
+            @if (uploadCompleted)
+            {
+                <div class="success-message">
+
+                    ✅ File uploaded successfully!
+
+                </div>
+            }
+
+
+            @if (!string.IsNullOrWhiteSpace(uploadError))
+            {
+                <div class="error-message">
+
+                    ❌ @uploadError
+
+                </div>
+            }
+
+
+            <button type="button"
+                    class="upload-btn"
+                    @onclick="UploadFile"
+                    disabled="@isUploading">
+
+                @if (isUploading)
+                {
+                    <span>
+                        ⏳ Uploading...
+                    </span>
+                }
+                else
+                {
+                    <span>
+                        ☁️ Upload to Azure
+                    </span>
+                }
+
+            </button>
+        }
+
+    </div>
+
+</div>
+
+
+<style>
+
+    .upload-page {
+        min-height: 80vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #f4f7fb;
+        padding: 30px;
+    }
+
+
+    .upload-card {
+        width: 520px;
+        background: white;
+        padding: 35px;
+        border-radius: 16px;
+        box-shadow: 0 10px 35px rgba(0,0,0,0.08);
+    }
+
+
+    .upload-header {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+
+    .upload-header h2 {
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+
+    .upload-header p {
+        color: #777;
+    }
+
+
+    .upload-zone {
+        border: 2px dashed #6c63ff;
+        border-radius: 14px;
+        padding: 45px 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: 0.3s;
+        display: block;
+        position: relative;
+        overflow: hidden;
+    }
+
+
+    .upload-zone:hover {
+        background: #f6f5ff;
+        border-color: #4b42e6;
+        transform: translateY(-2px);
+    }
+
+
+    .upload-zone.file-selected {
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+
+    .file-input {
+        position: absolute;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        left: 0;
+        top: 0;
+        cursor: pointer;
+        z-index: 2;
+    }
+
+
+    .upload-icon {
+        font-size: 50px;
+        margin-bottom: 10px;
+    }
+
+
+    .upload-zone h4 {
+        font-weight: 600;
+    }
+
+
+    .upload-zone p {
+        color: #777;
+        margin-bottom: 5px;
+    }
+
+
+    .upload-zone span {
+        font-size: 13px;
+        color: #999;
+    }
+
+
+    .file-preview {
+        display: flex;
+        align-items: center;
+        background: #f7f8fc;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+
+
+    .file-icon {
+        font-size: 35px;
+        margin-right: 15px;
+    }
+
+
+    .file-details {
+        flex: 1;
+        min-width: 0;
+    }
+
+
+    .file-details h5 {
+        margin: 0;
+        font-size: 16px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+
+    .file-details p {
+        margin: 3px 0 0;
+        color: #777;
+        font-size: 13px;
+    }
+
+
+    .remove-btn {
+        border: none;
+        background: #ffe5e5;
+        color: #e53935;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        cursor: pointer;
+        position: relative;
+        z-index: 5;
+    }
+
+
+    .remove-btn:hover {
+        background: #e53935;
+        color: white;
+    }
+
+
+    .progress-container {
+        margin-bottom: 20px;
+    }
+
+
+    .progress-container p {
+        text-align: center;
+        font-size: 13px;
+        margin-top: 7px;
+        color: #666;
+    }
+
+
+    .success-message {
+        background: #e8f8ee;
+        color: #198754;
+        padding: 12px;
+        border-radius: 8px;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+
+
+    .error-message {
+        background: #ffe5e5;
+        color: #b71c1c;
+        padding: 12px;
+        border-radius: 8px;
+        text-align: center;
+        margin-bottom: 15px;
+        word-break: break-word;
+    }
+
+
+    .upload-btn {
+        width: 100%;
+        border: none;
+        background: #6c63ff;
+        color: white;
+        padding: 13px;
+        border-radius: 9px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+
+    .upload-btn:hover:not(:disabled) {
+        background: #5148e5;
+        transform: translateY(-1px);
+    }
+
+
+    .upload-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+</style>
+
+
+@code
+{
+    private const long MaxFileSize = 100 * 1024 * 1024;
+
+    private IBrowserFile? selectedFile;
+
+    private bool isUploading;
+
+    private bool uploadCompleted;
+
+    private string? uploadError;
+
+    private void HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+
+        uploadCompleted = false;
+
+        uploadError = null;
+    }
+    private void RemoveFile()
+    {
+        selectedFile = null;
+
+        uploadCompleted = false;
+
+        uploadError = null;
+    }
+    private async Task UploadFile()
+    {
+        if (selectedFile is null)
+            return;
+
+
+        isUploading = true;
+
+        uploadCompleted = false;
+
+        uploadError = null;
+
+
+        try
+        {
+            await using Stream fileStream =
+                selectedFile.OpenReadStream(MaxFileSize);
+
+            await fileUploader.UploadFileAsync(selectedFile.Name,fileStream);
+
+            uploadCompleted = true;
+        }
+        catch (IOException ex)
+        {
+            uploadError = $"File error: {ex.Message}";
+        }
+        catch (Exception ex)
+        {
+            uploadError = $"Upload failed: {ex.Message}";
+        }
+        finally
+        {
+            isUploading = false;
+        }
+    }
+    private static string GetFileSize(long bytes)
+    {
+        if (bytes < 1024)
+            return $"{bytes} Bytes";
+
+                
+        if (bytes < 1024 * 1024)
+            return $"{bytes / 1024d:F2} KB";
+
+
+        return $"{bytes / (1024d * 1024d):F2} MB";
+    }
+    private static string GetFileIcon(string fileName)
+    {
+        string extension =
+            Path.GetExtension(fileName).ToLowerInvariant();
+        return extension switch
+        {
+            ".pdf" => "📕",
+
+            ".doc" or ".docx" => "📘",
+
+            ".png" or ".jpg" or ".jpeg" => "🖼️",
+
+            ".zip" => "🗜️",
+
+            _ => "📄"
+        };
+    }
+}

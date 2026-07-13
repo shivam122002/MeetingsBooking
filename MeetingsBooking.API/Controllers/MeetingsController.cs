@@ -10,11 +10,12 @@ namespace MeetingsBooking.API.Controllers
     public class MeetingsController : ControllerBase
     {
         private readonly IBookMeetingService _bookMeetingService;
-
+        private readonly IAzureBlobStorageService _blobStorageService;
         public MeetingsController(
-            IBookMeetingService bookMeetingService)
+            IBookMeetingService bookMeetingService, IAzureBlobStorageService blobStorageService  )
         {
             _bookMeetingService = bookMeetingService;
+            _blobStorageService = blobStorageService;
         }
 
         [HttpPost("book-meeting")]
@@ -53,7 +54,26 @@ namespace MeetingsBooking.API.Controllers
                 return NotFound();
             }
             return Ok(meeting);
-        }   
+        }
+        [HttpPost("upload-file")]
+        public async Task<IActionResult> UploadFile(IFormFile file,CancellationToken cancellationToken)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("File not found.");
+
+            using var stream = file.OpenReadStream();
+
+            await _blobStorageService.UploadFileAsync(file.FileName, stream);
+
+            return Ok("Done");
+        }
+        [HttpGet("getAllFiles")]
+        public async Task<IActionResult> GetAllFiles(CancellationToken cancellationToken)
+        {
+            var files = await _blobStorageService.ListFilesAsync();
+
+            return Ok(files);
+        }
     }
 }
 

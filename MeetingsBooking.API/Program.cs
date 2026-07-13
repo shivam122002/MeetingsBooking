@@ -36,11 +36,11 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();
 }
 // Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
-app.UseSwagger();
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
     app.UseSwaggerUI();
-//}
+}
 
 app.UseHttpsRedirection();
 app.UseCors("UI");

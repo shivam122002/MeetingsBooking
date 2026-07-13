@@ -23,6 +23,7 @@ public static class DependencyInjection
         services.AddScoped<
             IMeetingRepository,
             MeetingRepository>();
+        services.AddScoped<IAzureBlobStorageRepository, AzureBlobStorageRepository>();
 
         return services;
     }
