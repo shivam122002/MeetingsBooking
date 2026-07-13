@@ -14,7 +14,7 @@ public static class DependencyInjection
     {
         var connectionString =
             configuration.GetConnectionString(
-                "DefaultConnection");
+                "ConnctionString");
 
         services.AddDbContext<MeetingsBookingDbContext>(
             options =>
