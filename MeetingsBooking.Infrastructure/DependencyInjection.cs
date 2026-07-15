@@ -1,5 +1,7 @@
 ﻿using MeetingsBooking.Application.Interfaces.Repositories;
+using MeetingsBooking.Application.Interfaces.Services;
 using MeetingsBooking.Infrastructure.Persistence;
+using MeetingsBooking.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,17 +16,15 @@ public static class DependencyInjection
     {
         var connectionString =
             configuration.GetConnectionString(
-                "ConnctionString");
+                "DefaultConnection");
 
-        services.AddDbContext<MeetingsBookingDbContext>(
-            options =>
+        services.AddDbContext<MeetingsBookingDbContext>(options =>
                 options.UseSqlServer(connectionString));
 
-        services.AddScoped<
-            IMeetingRepository,
-            MeetingRepository>();
+        services.AddScoped<IMeetingRepository,MeetingRepository>();
         services.AddScoped<IAzureBlobStorageRepository, AzureBlobStorageRepository>();
-
+        services.AddScoped<IPasswordHasher, PasswordHasherService>();
+        services.AddScoped<IUserRepository, UserRepository>(); 
         return services;
     }
 }

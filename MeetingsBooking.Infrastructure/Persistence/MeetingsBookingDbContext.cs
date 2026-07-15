@@ -11,7 +11,11 @@ public class MeetingsBookingDbContext : DbContext
     {
     }
 
+    public DbSet<User> Users { get; set; }
+
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<Meetings> Meetings => Set<Meetings>();
+
 
     protected override void OnModelCreating(
         ModelBuilder modelBuilder)
