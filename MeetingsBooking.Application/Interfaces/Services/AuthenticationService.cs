@@ -16,10 +16,14 @@ namespace MeetingsBooking.Application.Interfaces.Services
 
         private readonly IPasswordHasher _passwordHasher;
 
-        public AuthenticationService(IUserRepository userRepository,IPasswordHasher passwordHasher)
+        private readonly IJwtTokenGenerator _jwtTokenGenerator;
+        private readonly IRefreshTokenRepository _refreshTokenRepository;        
+        public AuthenticationService(IUserRepository userRepository,IPasswordHasher passwordHasher,IJwtTokenGenerator jwtTokenGenerator,IRefreshTokenRepository refreshTokenRepository)
         {
             _userRepository = userRepository;
             _passwordHasher = passwordHasher;
+            _jwtTokenGenerator = jwtTokenGenerator;
+            _refreshTokenRepository = refreshTokenRepository;
         }
         public async Task<RegisterResponseDto> RegisterAsync(RegisterRequestDto request, CancellationToken cancellationToken)
         {
@@ -52,6 +56,36 @@ namespace MeetingsBooking.Application.Interfaces.Services
             {
                 UserId = user.Id,
                 Message = "User registered successfully."
+            };
+        }
+        public async Task<LoginResponseDto> LoginAsync(LoginRequestDto request,CancellationToken cancellationToken)
+        {
+            request.Email = request.Email.Trim().ToLowerInvariant();
+            var user = await _userRepository.GetByEmailAsync(request.Email,cancellationToken);
+            if (user is null)
+            {
+                throw new UnauthorizedAccessException("Invalid email or password.");
+            }
+            var isPasswordValid =_passwordHasher.VerifyPassword(user,user.PasswordHash,request.Password);
+            if (!isPasswordValid)
+            {
+                throw new UnauthorizedAccessException("Invalid email or password.");
+            }
+            if (!user.IsActive)
+            {
+                throw new UnauthorizedAccessException("Your account is inactive.");
+            }
+            var accessTokenResult = _jwtTokenGenerator.GenerateAccessToken(user);   
+            var accessToken = accessTokenResult.Token;//_jwtTokenGenerator.GenerateAccessToken(user);
+            var refreshToken =_jwtTokenGenerator.GenerateRefreshToken();
+            refreshToken.UserId = user.Id;
+            await _refreshTokenRepository.AddAsync(refreshToken,cancellationToken);
+            return new LoginResponseDto
+            {
+                AccessToken = accessToken,
+
+                RefreshToken = refreshToken.Token,
+                ExpiresAt = accessTokenResult.ExpiresAt
             };
         }
     }

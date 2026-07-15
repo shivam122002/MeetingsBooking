@@ -11,6 +11,7 @@ public static class DependencyInjection
     {
         services.AddScoped<IBookMeetingService,BookMeetingService>();
         services.AddScoped<IAzureBlobStorageService, AzureBlobStorageService>();
+        services.AddScoped<IAuthenticationService, AuthenticationService>();
         return services;
     }
 }

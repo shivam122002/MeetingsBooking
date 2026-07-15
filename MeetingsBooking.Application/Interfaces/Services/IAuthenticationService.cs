@@ -10,5 +10,7 @@ namespace MeetingsBooking.Application.Interfaces.Services
     public interface IAuthenticationService
     {
         Task<RegisterResponseDto> RegisterAsync(RegisterRequestDto request,CancellationToken cancellationToken);
+
+        Task<LoginResponseDto> LoginAsync(LoginRequestDto request, CancellationToken cancellationToken);
     }
 }

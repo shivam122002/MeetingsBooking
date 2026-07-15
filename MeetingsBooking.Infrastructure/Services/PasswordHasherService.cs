@@ -13,17 +13,14 @@ namespace MeetingsBooking.Infrastructure.Services
     {
         private readonly PasswordHasher<User> _passwordHasher = new();
 
-        public string HashPassword(string password)
+        public string HashPassword(User user,string password)
         {
-            var user = new User();
             return _passwordHasher.HashPassword(
                 user,
                 password);
         }
-        public bool VerifyPassword(string hashedPassword,string providedPassword)
+        public bool VerifyPassword(User user,string hashedPassword,string providedPassword)
         {
-            var user = new User();
-
             var result = _passwordHasher.VerifyHashedPassword(
                 user,
                 hashedPassword,

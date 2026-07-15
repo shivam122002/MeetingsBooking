@@ -6,14 +6,14 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var keyVaultUri = builder.Configuration["KeyVaultUri"];
+//var keyVaultUri = builder.Configuration["KeyVaultUri"];
 
-if (!string.IsNullOrEmpty(keyVaultUri))
-{
-    builder.Configuration.AddAzureKeyVault(
-        new Uri(keyVaultUri),
-        new DefaultAzureCredential());
-}
+//if (!string.IsNullOrEmpty(keyVaultUri))
+//{
+//    builder.Configuration.AddAzureKeyVault(
+//        new Uri(keyVaultUri),
+//        new DefaultAzureCredential());
+//}
 // Add services to the container.
 
 builder.Services.AddControllers();

@@ -14,17 +14,19 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        var connectionString =
-            configuration.GetConnectionString(
-                "DefaultConnection");
+        var connectionString =configuration.GetConnectionString("DefaultConnection");
 
+        services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
         services.AddDbContext<MeetingsBookingDbContext>(options =>
                 options.UseSqlServer(connectionString));
 
         services.AddScoped<IMeetingRepository,MeetingRepository>();
         services.AddScoped<IAzureBlobStorageRepository, AzureBlobStorageRepository>();
         services.AddScoped<IPasswordHasher, PasswordHasherService>();
-        services.AddScoped<IUserRepository, UserRepository>(); 
+        services.AddScoped<IUserRepository, UserRepository>();
+        
+        services.AddScoped<IJwtTokenGenerator,JwtTokenGenerator>();
+        services.AddScoped<IRefreshTokenRepository,RefreshTokenRepository>();
         return services;
     }
 }

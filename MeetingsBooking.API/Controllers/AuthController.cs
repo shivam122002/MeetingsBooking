@@ -20,6 +20,12 @@ namespace MeetingsBooking.API.Controllers
         {
             var response = await _authenticationService.RegisterAsync(request, cancellationToken);
             return Ok(response);
-        }   
+        }
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequestDto request, CancellationToken cancellationToken)
+        {
+            var response = await _authenticationService.LoginAsync(request, cancellationToken);
+            return Ok(response);
+        }
     }
 }
