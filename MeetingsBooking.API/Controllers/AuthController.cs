@@ -1,7 +1,10 @@
 ﻿using MeetingsBooking.Application.Interfaces.Services;
 using MeetingsBooking.Shared.Dtos.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace MeetingsBooking.API.Controllers
 {
@@ -26,6 +29,25 @@ namespace MeetingsBooking.API.Controllers
         {
             var response = await _authenticationService.LoginAsync(request, cancellationToken);
             return Ok(response);
+        }
+        [Authorize]
+        [HttpGet("me")]
+        public IActionResult Me()
+        {
+            return Ok(new
+            {
+                UserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value,
+
+                Email = User.FindFirst(ClaimTypes.Email)?.Value,
+
+                Name = User.Identity?.Name,
+
+                Role = User.FindFirst(ClaimTypes.Role)?.Value,
+
+                IsAuthenticated = User.Identity?.IsAuthenticated,
+
+                AuthenticationType = User.Identity?.AuthenticationType
+            });
         }
     }
 }

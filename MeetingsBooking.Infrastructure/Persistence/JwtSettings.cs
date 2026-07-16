@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MeetingsBooking.Infrastructure.Persistence
 {
-    public class JwtSettings
+    public class jwtSettings
     {
         public string Secret { get; set; } = string.Empty;
 

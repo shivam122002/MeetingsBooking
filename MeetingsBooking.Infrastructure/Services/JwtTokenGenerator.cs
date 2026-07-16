@@ -17,10 +17,10 @@ namespace MeetingsBooking.Infrastructure.Services
 {
     public class JwtTokenGenerator : IJwtTokenGenerator
     {
-        private readonly JwtSettings _jwtSettings;
+        private readonly jwtSettings _jwtSettings;
 
         public JwtTokenGenerator(
-            IOptions<JwtSettings> options)
+            IOptions<jwtSettings> options)
         {
             _jwtSettings = options.Value;
         }
