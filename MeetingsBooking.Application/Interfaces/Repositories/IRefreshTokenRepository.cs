@@ -9,8 +9,8 @@ namespace MeetingsBooking.Application.Interfaces.Repositories
 {
     public interface IRefreshTokenRepository
     {
-        Task AddAsync(
-         RefreshToken refreshToken,
-         CancellationToken cancellationToken);
+        Task AddAsync(RefreshToken refreshToken,CancellationToken cancellationToken);
+        Task RevokeRefreshTokenAsync(RefreshToken refreshToken, CancellationToken cancellationToken);
+        Task<RefreshToken?> GetByTokenAsync(string token, CancellationToken cancellationToken);
     }
 }

@@ -18,18 +18,6 @@ namespace MeetingsBooking.API.Controllers
         {
             _authenticationService = authenticationService;
         }
-        [HttpPost("register")]   
-        public async Task<IActionResult> Register([FromBody] RegisterRequestDto request, CancellationToken cancellationToken)
-        {
-            var response = await _authenticationService.RegisterAsync(request, cancellationToken);
-            return Ok(response);
-        }
-        [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequestDto request, CancellationToken cancellationToken)
-        {
-            var response = await _authenticationService.LoginAsync(request, cancellationToken);
-            return Ok(response);
-        }
         [Authorize]
         [HttpGet("me")]
         public IActionResult Me()
@@ -48,6 +36,24 @@ namespace MeetingsBooking.API.Controllers
 
                 AuthenticationType = User.Identity?.AuthenticationType
             });
+        }
+        [HttpPost("register")]   
+        public async Task<IActionResult> Register([FromBody] RegisterRequestDto request, CancellationToken cancellationToken)
+        {
+            var response = await _authenticationService.RegisterAsync(request, cancellationToken);
+            return Ok(response);
+        }
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequestDto request, CancellationToken cancellationToken)
+        {
+            var response = await _authenticationService.LoginAsync(request, cancellationToken);
+            return Ok(response);
+        }
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestDto request, CancellationToken cancellationToken)
+        {
+            var response = await _authenticationService.RefreshTokenAsync(request, cancellationToken);
+            return Ok(response);
         }
     }
 }

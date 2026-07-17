@@ -12,5 +12,7 @@ namespace MeetingsBooking.Application.Interfaces.Services
         Task<RegisterResponseDto> RegisterAsync(RegisterRequestDto request,CancellationToken cancellationToken);
 
         Task<LoginResponseDto> LoginAsync(LoginRequestDto request, CancellationToken cancellationToken);
+
+        Task<LoginResponseDto> RefreshTokenAsync(RefreshTokenRequestDto request, CancellationToken cancellationToken);  
     }
 }

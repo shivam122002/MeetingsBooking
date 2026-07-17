@@ -88,5 +88,32 @@ namespace MeetingsBooking.Application.Interfaces.Services
                 ExpiresAt = accessTokenResult.ExpiresAt
             };
         }
+
+        public async Task<LoginResponseDto> RefreshTokenAsync(RefreshTokenRequestDto request, CancellationToken cancellationToken)
+        {
+           // throw new NotImplementedException();
+            var existingRefreshToken = await _refreshTokenRepository.GetByTokenAsync(request.RefreshToken, cancellationToken);
+            if (existingRefreshToken is null || existingRefreshToken.IsRevoked || existingRefreshToken.ExpiresAt <= DateTime.UtcNow)
+            {
+                throw new UnauthorizedAccessException("Invalid or expired refresh token.");
+            }
+            var user = await _userRepository.GetUserByIdAsync(existingRefreshToken.UserId, cancellationToken);
+            if (user is null || !user.IsActive)
+            {
+                throw new UnauthorizedAccessException("Invalid or expired refresh token.");
+            }
+            var accessTokenResult = _jwtTokenGenerator.GenerateAccessToken(user);
+            var accessToken = accessTokenResult.Token;
+            var refreshToken = _jwtTokenGenerator.GenerateRefreshToken(); 
+            refreshToken.UserId = user.Id;    
+            await _refreshTokenRepository.RevokeRefreshTokenAsync(existingRefreshToken, cancellationToken);
+            await _refreshTokenRepository.AddAsync(refreshToken, cancellationToken);    
+            return new LoginResponseDto
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken.Token,
+                ExpiresAt = accessTokenResult.ExpiresAt
+            };
+        }
     }
 }

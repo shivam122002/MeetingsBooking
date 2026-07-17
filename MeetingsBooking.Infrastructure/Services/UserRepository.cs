@@ -39,5 +39,9 @@ namespace MeetingsBooking.Infrastructure.Services
                     x => x.Email == email,
                     cancellationToken);
         }
+        public async Task<User?> GetUserByIdAsync(Guid userId, CancellationToken cancellationToken)
+        {
+            return await _context.Users.FirstOrDefaultAsync(x => x.Id == userId,cancellationToken);
+        }   
     }
 }

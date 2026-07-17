@@ -36,4 +36,8 @@ namespace MeetingsBooking.Shared.Dtos.Authentication
 
         public DateTime ExpiresAt { get; set; }
     }
+    public class RefreshTokenRequestDto
+    {
+        public string RefreshToken { get; set; } = string.Empty;
+    }
 }
