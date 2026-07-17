@@ -39,7 +39,7 @@ namespace MeetingsBooking.Application.Interfaces.Services
                 FirstName = request.FirstName.Trim(),
                 LastName = request.LastName.Trim(),
                 Email = request.Email,
-                Role = Roles.Employee,
+                Role = Roles.Admin,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow
             };

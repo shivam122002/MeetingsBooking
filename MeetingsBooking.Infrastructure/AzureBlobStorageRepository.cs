@@ -22,7 +22,14 @@ namespace MeetingsBooking.Infrastructure
                 ?? throw new InvalidOperationException(
                     "AzureBlobStorage:ContainerName is required.");
 
-            blobServiceClient = new BlobServiceClient(connectionString);
+            try
+            {
+                blobServiceClient = new BlobServiceClient(connectionString);
+            }
+            catch(Exception ex)
+            {
+
+            }
         }
         private async Task<BlobContainerClient> GetContainerClientAsync()
         {

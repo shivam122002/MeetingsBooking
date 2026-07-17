@@ -9,12 +9,17 @@
   <!-- AzureBlobStorageService should be compiled with the project; removed explicit exclusion. -->
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="8.0.28" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\MeetingsBooking.Domain\MeetingsBooking.Domain.csproj" />
     <ProjectReference Include="..\MeetingsBooking.Shared\MeetingsBooking.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Authorization\Policies\" />
   </ItemGroup>
 
 </Project>

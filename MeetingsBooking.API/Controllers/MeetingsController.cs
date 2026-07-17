@@ -1,5 +1,7 @@
 ﻿using MeetingsBooking.Application.Interfaces.Services;
+using MeetingsBooking.Domain.Enums;
 using MeetingsBooking.Shared.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,9 +21,7 @@ namespace MeetingsBooking.API.Controllers
         }
 
         [HttpPost("book-meeting")]
-        public async Task<IActionResult> BookMeeting(
-            [FromBody] BookMeetingsRequestDto request,
-            CancellationToken cancellationToken)
+        public async Task<IActionResult> BookMeeting([FromBody] BookMeetingsRequestDto request,CancellationToken cancellationToken)
         {
             var meetingId =
                 await _bookMeetingService.BookMeetingAsync(
@@ -39,11 +39,19 @@ namespace MeetingsBooking.API.Controllers
                     meetingId
                 });
         }
-        [HttpGet("getAllmeetings")]
+        [Authorize(Roles = nameof(Roles.Admin))]
+        [HttpGet("all")]
         public async Task<IActionResult> GetAllMeetings(CancellationToken cancellationToken)
         {
             var meetings = await _bookMeetingService.GetAllAsync(cancellationToken);
-            return Ok(meetings);
+            //return Ok(meetings);
+            return Ok("Only Admin can access this endpoint.");
+        }
+        [Authorize(Roles = nameof(Roles.Employee))]
+        [HttpGet("my")]
+        public IActionResult GetMyMeetings()
+        {
+            return Ok("Only Employee can access this endpoint.");
         }
         [HttpGet("get-meeting/{id}")]
         public async Task<IActionResult> GetMeeting([FromRoute] Guid id,CancellationToken cancellationToken)
