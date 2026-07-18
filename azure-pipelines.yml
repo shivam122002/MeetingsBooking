@@ -19,13 +19,13 @@ steps:
   displayName: 'Restore Packages'
   inputs:
     command: 'restore'
-    projects: 'MeetingBooking.sln'
+    projects: 'MeetingBooking.slnx'
 
 - task: DotNetCoreCLI@2
   displayName: 'Build Solution'
   inputs:
     command: 'build'
-    projects: 'MeetingBooking.sln'
+    projects: 'MeetingBooking.slnx'
     arguments: '--configuration $(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
