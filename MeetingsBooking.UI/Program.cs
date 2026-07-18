@@ -17,7 +17,7 @@ var hostEnvironment = builder.HostEnvironment;
 
 var baseUrl = hostEnvironment.IsDevelopment()
     ? "https://localhost:7099/"
-    : "https://meeting-scheduler-api.azurewebsites.net/";
+    : "https://meetings-booking-api-fybxgffbcndfd3dd.westeurope-01.azurewebsites.net/";
 
 builder.Services.AddScoped(sp => new HttpClient
 {
