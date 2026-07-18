@@ -14,7 +14,7 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        var connectionString =configuration.GetConnectionString("DefaultConnection");
+        var connectionString =configuration.GetConnectionString("DbConnectionString");
 
         services.Configure<jwtSettings>(configuration.GetSection("JwtSettings"));
         services.AddDbContext<MeetingsBookingDbContext>(options =>
