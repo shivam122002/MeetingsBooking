@@ -12,24 +12,13 @@ namespace MeetingsBooking.Infrastructure
         private readonly string containerName; // Replace with your actual container name
         public AzureBlobStorageRepository(IConfiguration configuration) 
         {
-            var connectionString =
-     configuration["AzureBlobStorage:AzureBlobStorageString"]
+            var connectionString =configuration["AzureBlobStorage:AzureBlobStorageString"]
      ?? throw new InvalidOperationException(
          "AzureBlobStorage:AzureBlobStorageString is required.");
 
-            containerName =
-                configuration["AzureBlobStorage:ContainerName"]
-                ?? throw new InvalidOperationException(
-                    "AzureBlobStorage:ContainerName is required.");
-
-            try
-            {
-                blobServiceClient = new BlobServiceClient(connectionString);
-            }
-            catch(Exception ex)
-            {
-
-            }
+            containerName =configuration["AzureBlobStorage:ContainerName"]
+                ?? throw new InvalidOperationException("AzureBlobStorage:ContainerName is required.");
+            blobServiceClient = new BlobServiceClient(connectionString);
         }
         private async Task<BlobContainerClient> GetContainerClientAsync()
         {

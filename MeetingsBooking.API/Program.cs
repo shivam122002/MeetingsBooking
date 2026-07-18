@@ -13,14 +13,14 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//var keyVaultUri = builder.Configuration["KeyVaultUri"];
+var keyVaultUri = builder.Configuration["KeyVaultUri"];
 
-//if (!string.IsNullOrEmpty(keyVaultUri))
-//{
-//    builder.Configuration.AddAzureKeyVault(
-//        new Uri(keyVaultUri),
-//        new DefaultAzureCredential());
-//}
+if (!string.IsNullOrEmpty(keyVaultUri))
+{
+    builder.Configuration.AddAzureKeyVault(
+        new Uri(keyVaultUri),
+        new DefaultAzureCredential());
+}
 // Add services to the container.
 var jwtSettings = builder.Configuration
     .GetSection("JwtSettings")
@@ -101,11 +101,11 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();
 }
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+//}
 
 app.UseHttpsRedirection();
 app.UseCors("UI");
